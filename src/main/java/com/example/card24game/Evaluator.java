@@ -1,18 +1,19 @@
 package com.example.card24game;
 
+// Evaluates the arithmetic expression entered by the player
 public class Evaluator {
 
     private String expression;
     private int position;
 
-    // Starts evaluating the expression
+    // Starts evaluating the expression and returns the final result
     public double evaluate(String expression) {
         this.expression = expression.replaceAll("\\s+", "");
         this.position = 0;
 
         double result = parseExpression();
 
-        // Makes sure the whole expression was read
+        // Makes sure the entire expression was read
         if (position != this.expression.length()) {
             throw new IllegalArgumentException("Invalid expression");
         }
@@ -20,7 +21,7 @@ public class Evaluator {
         return result;
     }
 
-    // Does addition and subtraction
+    // Handles addition and subtraction
     private double parseExpression() {
         double result = parseTerm();
 
@@ -43,7 +44,7 @@ public class Evaluator {
         return result;
     }
 
-    // Does multiplication and division
+    // Handles multiplication and division
     private double parseTerm() {
         double result = parseFactor();
 
@@ -59,6 +60,7 @@ public class Evaluator {
 
                 double divisor = parseFactor();
 
+                // Stops the player from dividing by zero
                 if (divisor == 0) {
                     throw new ArithmeticException("Cannot divide by zero");
                 }
@@ -73,7 +75,7 @@ public class Evaluator {
         return result;
     }
 
-    // Handles numbers and parentheses
+    // Handles numbers and expressions inside parentheses
     private double parseFactor() {
         if (position >= expression.length()) {
             throw new IllegalArgumentException("Invalid expression");
@@ -84,6 +86,7 @@ public class Evaluator {
 
             double result = parseExpression();
 
+            // Makes sure an opening parenthesis has a closing parenthesis
             if (position >= expression.length()
                     || expression.charAt(position) != ')') {
                 throw new IllegalArgumentException("Missing parenthesis");
@@ -96,7 +99,7 @@ public class Evaluator {
         return parseNumber();
     }
 
-    // Gets the next number
+    // Reads the next number from the expression
     private double parseNumber() {
         int start = position;
 
@@ -105,6 +108,7 @@ public class Evaluator {
             position++;
         }
 
+        // No number was found where one was expected
         if (start == position) {
             throw new IllegalArgumentException("Expected a number");
         }

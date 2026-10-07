@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+// Controls the Card 24 game and handles the user interactions
 public class HelloController {
 
     @FXML
@@ -28,16 +29,18 @@ public class HelloController {
     @FXML
     private TextField expressionField;
 
+    // Stores the full deck and the four cards currently being displayed
     private ArrayList<Card> deck;
     private ArrayList<Card> currentCards;
 
+    // Sets up the deck and displays the first four cards when the game starts
     @FXML
     public void initialize() {
         createDeck();
         generateCards();
     }
 
-    // Makes the deck of 52 cards
+    // Creates all 52 cards and gives each rank its Card 24 value
     private void createDeck() {
         deck = new ArrayList<>();
 
@@ -48,6 +51,7 @@ public class HelloController {
                 "8", "9", "10", "jack", "queen", "king"
         };
 
+        // The array position gives Ace a value of 1 through King at 13
         for (String suit : suits) {
             for (int i = 0; i < ranks.length; i++) {
                 int value = i + 1;
@@ -56,7 +60,7 @@ public class HelloController {
         }
     }
 
-    // Picks 4 random cards
+    // Shuffles the deck and selects four random cards
     private void generateCards() {
         Collections.shuffle(deck);
 
@@ -69,7 +73,7 @@ public class HelloController {
         displayCards();
     }
 
-    // Shows the card images
+    // Displays the images for the four currently selected cards
     private void displayCards() {
         ImageView[] cardViews = {card1, card2, card3, card4};
 
@@ -84,17 +88,18 @@ public class HelloController {
         }
     }
 
-    // Checks the expression when Verify is clicked
+    // Checks the player's expression when the Verify button is clicked
     @FXML
     private void verifyExpression() {
         String expression = expressionField.getText();
 
+        // Prevents an empty expression from being submitted
         if (expression == null || expression.trim().isEmpty()) {
             showAlert("Invalid Expression", "Please enter an expression.");
             return;
         }
 
-        // Only allows the math symbols used in the game
+        // Only allows numbers and the math symbols supported by the game
         if (!expression.matches("[0-9+\\-*/()\\s]+")) {
             showAlert(
                     "Invalid Expression",
@@ -103,7 +108,7 @@ public class HelloController {
             return;
         }
 
-        // Makes sure all 4 card values are used only once
+        // Makes sure the player used all four displayed card values exactly once
         if (!usesCorrectCards(expression)) {
             showAlert(
                     "Invalid Expression",
@@ -116,6 +121,7 @@ public class HelloController {
             Evaluator evaluator = new Evaluator();
             double result = evaluator.evaluate(expression);
 
+            // A small tolerance is used because division can create decimal values
             if (Math.abs(result - 24.0) < 0.000001) {
                 showAlert("Correct!", "Your expression equals 24!");
             } else {
@@ -133,7 +139,7 @@ public class HelloController {
         }
     }
 
-    // Checks if the user used the same numbers as the cards
+    // Compares the numbers entered by the player with the four card values
     private boolean usesCorrectCards(String expression) {
         ArrayList<Integer> cardValues = new ArrayList<>();
 
@@ -143,19 +149,22 @@ public class HelloController {
 
         ArrayList<Integer> enteredValues = new ArrayList<>();
 
+        // Finds every complete number in the expression
         Matcher matcher = Pattern.compile("\\d+").matcher(expression);
 
         while (matcher.find()) {
             enteredValues.add(Integer.parseInt(matcher.group()));
         }
 
+        // Sorting lets both lists be compared even if the cards were used
+        // in a different order in the expression
         Collections.sort(cardValues);
         Collections.sort(enteredValues);
 
         return cardValues.equals(enteredValues);
     }
 
-    // Makes whole numbers display without .0
+    // Displays whole-number results without an unnecessary .0
     private String formatResult(double result) {
         if (result == (long) result) {
             return String.valueOf((long) result);
@@ -164,14 +173,14 @@ public class HelloController {
         return String.valueOf(result);
     }
 
-    // Gets 4 new cards and clears the text field
+    // Generates four new cards and clears the previous expression
     @FXML
     private void refreshCards() {
         generateCards();
         expressionField.clear();
     }
 
-    // Shows a message to the user
+    // Displays a dialog box with a message for the player
     private void showAlert(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle(title);
